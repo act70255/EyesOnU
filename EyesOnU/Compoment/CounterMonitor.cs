@@ -26,7 +26,7 @@ namespace EyesOnU.Compoment
         [Postfix("B")]
         NET
     }
-    public class CounterMonitor //: Label
+    public class CounterMonitor
     {
         public event EventHandler<DataEventArgs> ValueUpdated;
         PerformanceCounter _performanceCounter;
@@ -35,24 +35,17 @@ namespace EyesOnU.Compoment
         public CounterType CounterType { get; set; }
         public CounterMonitor()
         {
-            Initialize();
         }
         public CounterMonitor(PerformanceCounter counter, CounterType counterType)
         {
-            Initialize();
             _performanceCounter = counter;
             CounterType = counterType;
         }
 
         public CounterMonitor(NetworkCounter counter, CounterType counterType)
         {
-            Initialize();
             _networkCounter = counter;
             CounterType = counterType;
-        }
-
-        void Initialize()
-        {
         }
 
         protected virtual void OnValueUpdated(DataEventArgs e)

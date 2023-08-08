@@ -24,41 +24,9 @@ namespace EyesOnU.Service
         {
             return performanceCounterSent.NextValue();
         }
-        public string GetSentString()
-        {
-            var value = GetSent();
-            if(value > 1048576)
-            {
-                return (value / 1048576).ToString("0.00") + " MB";
-            }
-            else if(value > 1024)
-            {
-                return (value / 1024).ToString("0.00") + " KB";
-            }
-            else
-            {
-                return value.ToString("0.00") + " B";
-            }
-        }
         public float GetReceived()
         {
             return performanceCounterReceived.NextValue();
-        }
-        public string GetReceivedString()
-        {
-            var value = GetReceived();
-            if (value > 1048576)
-            {
-                return (value / 1048576).ToString("0.00") + " MB";
-            }
-            else if (value > 1024)
-            {
-                return (value / 1024).ToString("0.00") + " KB";
-            }
-            else
-            {
-                return value.ToString("0.00") + " B";
-            }
         }
     }
 }

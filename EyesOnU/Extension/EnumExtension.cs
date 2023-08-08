@@ -39,5 +39,11 @@ namespace EyesOnU.Extension
             var attribute = Attribute.GetCustomAttribute(field, typeof(PostfixAttribute)) as PostfixAttribute;
             return attribute == null ? value.ToString() : attribute.Postfix;
         }
+        public static string GetCode(this Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = Attribute.GetCustomAttribute(field, typeof(CodeAttribute)) as CodeAttribute;
+            return attribute == null ? value.ToString() : attribute.Code;
+        }
     }
 }

@@ -135,11 +135,6 @@ namespace EyesOnU
             #endregion
         }
 
-        private void Each_ValueUpdated(object? sender, Compoment.DataEventArgs e)
-        {
-            Debug.WriteLine(e.Data);
-        }
-
         public static IEnumerable<Control> GetAllControls(Control control)
         {
             var controls = control.Controls.Cast<Control>();
