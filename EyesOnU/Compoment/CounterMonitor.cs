@@ -1,4 +1,5 @@
 ﻿using EyesOnU.Service;
+using EyesOnU.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,12 +14,16 @@ namespace EyesOnU.Compoment
     public enum CounterType
     {
         [Description("CPU usage")]
+        [Postfix("%")]
         CPU,
         [Description("RAM usage")]
+        [Postfix("B")]
         RAMused,
         [Description("RAM useable")]
+        [Postfix("B")]
         RAMspace,
         [Description("Network")]
+        [Postfix("B")]
         NET
     }
     public class CounterMonitor //: Label
@@ -68,7 +73,7 @@ namespace EyesOnU.Compoment
         {
             if (_performanceCounter != null)
             {
-                return $"{ParseValueString(_performanceCounter.NextValue(), CounterType == CounterType.CPU ? "%" : "B")}";
+                return $"{ParseValueString(_performanceCounter.NextValue(), CounterType.GetPostfix())}";
             }
             else if (_networkCounter != null)
             {
@@ -78,21 +83,22 @@ namespace EyesOnU.Compoment
         }
         public string ParseValueString(float value, string postfix = "B")
         {
+            string infix = " ";
             if (value > 1073741824)
             {
-                return (value / 1073741824).ToString("0.00") + (postfix == "B" ? "GB" : postfix);
+                return $"{(value / 1073741824).ToString("0.00")}{infix}{(postfix == "B" ? "GB" : postfix)}";
             }
             if (value > 1048576)
             {
-                return (value / 1048576).ToString("0.00") + (postfix == "B" ? "MB" : postfix);
+                return $"{(value / 1048576).ToString("0.00")}{infix}{(postfix == "B" ? "MB" : postfix)}";
             }
             else if (value > 1024)
             {
-                return (value / 1024).ToString("0.00") + (postfix == "B" ? "KB" : postfix);
+                return $"{(value / 1024).ToString("0.00")}{infix}{(postfix == "B" ? "KB" : postfix)}";
             }
             else
             {
-                return value.ToString("0.00") + (postfix == "B" ? "B" : postfix);
+                return $"{value.ToString("0.00")}{infix}{(postfix == "B" ? "B" : postfix)}";
             }
         }
     }

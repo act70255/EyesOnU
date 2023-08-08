@@ -111,7 +111,7 @@ namespace EyesOnU
                 each.ValueUpdated += (s, e) =>
                 {
                     if (s is CounterMonitor data)
-                        label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t{e.Data}"; });
+                        label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t - {e.Data}"; });
                 };
                 this.pnlContent.Controls.Add(label);
                 //controlsToMove.Add(label);
