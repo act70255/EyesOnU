@@ -1,6 +1,7 @@
 using EyesOnU.Compoment;
 using EyesOnU.Extension;
 using EyesOnU.Service;
+using System.Configuration;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -41,13 +42,20 @@ namespace EyesOnU
             return false;
         }
         #endregion
+        private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         SystemMonitorService systemMonitorService = SystemMonitorService.Instance;
         List<CounterMonitor> CounterList = new List<CounterMonitor>();
+        public int GetInt(string key)
+        {
+            var value = config.AppSettings.Settings[key]?.Value;
+            return Convert.ToInt32(value);
+        }
         public Monitor()
         {
             InitializeComponent();
             //Dragable
+
             Application.AddMessageFilter(this);
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -106,7 +114,7 @@ namespace EyesOnU
                 }
                 foreach (var each in CounterList)
                 {
-                    Task.Factory.StartNew(() => {  each.StartNext(); });
+                    Task.Factory.StartNew(() => {  each.StartNext(GetInt("RefreshRate")); });
                 }
             };
         }

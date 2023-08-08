@@ -55,13 +55,13 @@ namespace EyesOnU.Compoment
             ValueUpdated?.Invoke(this, e);
         }
 
-        public void StartNext()
+        public void StartNext(int refreshRate)
         {
             while (true)
             {
                 DisplayValue = NextValue();
                 OnValueUpdated(new DataEventArgs(DisplayValue));
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(refreshRate);
             }
         }
         public string NextValue()
