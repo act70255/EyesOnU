@@ -54,19 +54,48 @@ namespace EyesOnU
         public Monitor()
         {
             InitializeComponent();
-            //Dragable
+            InitializeContent();
+            InitializeForm();
 
+            this.Shown += (s, e) =>
+            {
+                foreach (var each in CounterList)
+                {
+                    Task.Factory.StartNew(() => {  each.StartNext(GetInt("RefreshRate")); });
+                }
+            };
+        }
+
+        void InitializeForm()
+        {
+            //Dragable
             Application.AddMessageFilter(this);
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.pnlContent.AutoSize = true;
             this.pnlContent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.Location = new Point(0, 0);
-            controlsToMove.Add(this);
-            controlsToMove.Add(this.pnlContent);
+            #region Register dragable
+            foreach (var ctrl in GetAllControls(this))
+            {
+                if (ctrl is not Button)
+                {
+                    controlsToMove.Add(ctrl);
+                }
+            } 
+            #endregion
+            #region AlwaysOnTop
+            this.Load += (s, e) =>
+              {
+                  SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
+              }; 
+            #endregion
+        }
 
+        void InitializeContent()
+        {
             int yPos = 0;
-
+            #region Counter
             CounterList = systemMonitorService.GetCounterMonitors();
             foreach (var each in CounterList)
             {
@@ -81,13 +110,16 @@ namespace EyesOnU
                 };
                 each.ValueUpdated += (s, e) =>
                 {
-                    if(s is CounterMonitor data)
-                    label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t{e.Data}"; });
+                    if (s is CounterMonitor data)
+                        label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t{e.Data}"; });
                 };
                 this.pnlContent.Controls.Add(label);
-                controlsToMove.Add(label);
+                //controlsToMove.Add(label);
                 yPos += label.Height;
-            }
+            } 
+            #endregion
+
+            #region Operator
             Button btnExit = new Button
             {
                 BackColor = Color.Black,
@@ -99,24 +131,8 @@ namespace EyesOnU
             {
                 this.Close();
             };
-            this.pnlContent.Controls.Add(btnExit);
-            this.Load += (s, e) =>
-            {
-                //On Top
-                SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
-            };
-            this.Shown += (s, e) =>
-            {
-                while (!this.IsHandleCreated)
-                {
-                    Debug.WriteLine("Waiting for handle...");
-                    Thread.Sleep(200);
-                }
-                foreach (var each in CounterList)
-                {
-                    Task.Factory.StartNew(() => {  each.StartNext(GetInt("RefreshRate")); });
-                }
-            };
+            this.pnlContent.Controls.Add(btnExit); 
+            #endregion
         }
 
         private void Each_ValueUpdated(object? sender, Compoment.DataEventArgs e)
@@ -124,5 +140,11 @@ namespace EyesOnU
             Debug.WriteLine(e.Data);
         }
 
+        public static IEnumerable<Control> GetAllControls(Control control)
+        {
+            var controls = control.Controls.Cast<Control>();
+            return controls.SelectMany(ctrl => GetAllControls(ctrl))
+                                          .Concat(controls);
+        }
     }
 }
