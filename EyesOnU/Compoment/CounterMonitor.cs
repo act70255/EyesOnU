@@ -77,17 +77,20 @@ namespace EyesOnU.Compoment
         public string ParseValueString(float value, string postfix = "B")
         {
             string infix = " ";
-            if (value > 1073741824)
+            var kb = 1024;
+            var mb = Math.Pow(kb, 2);
+            var gb = Math.Pow(kb, 3);
+            if (value > gb)
             {
-                return $"{(value / 1073741824).ToString("0.00")}{infix}{(postfix == "B" ? "GB" : postfix)}";
+                return $"{(value / gb).ToString("0.00")}{infix}{(postfix == "B" ? "GB" : postfix)}";
             }
-            if (value > 1048576)
+            if (value > mb)
             {
-                return $"{(value / 1048576).ToString("0.00")}{infix}{(postfix == "B" ? "MB" : postfix)}";
+                return $"{(value / mb).ToString("0.00")}{infix}{(postfix == "B" ? "MB" : postfix)}";
             }
-            else if (value > 1024)
+            else if (value > kb)
             {
-                return $"{(value / 1024).ToString("0.00")}{infix}{(postfix == "B" ? "KB" : postfix)}";
+                return $"{(value / kb).ToString("0.00")}{infix}{(postfix == "B" ? "KB" : postfix)}";
             }
             else
             {
