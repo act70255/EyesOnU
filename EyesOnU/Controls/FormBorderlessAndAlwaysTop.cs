@@ -47,7 +47,6 @@ namespace EyesOnU.Controls
             return false;
         }
         #endregion
-        public List<CounterMonitor> CounterList = new List<CounterMonitor>();
         public FormBorderlessAndAlwaysTop()
         {
             InitializeComponent();
@@ -63,8 +62,6 @@ namespace EyesOnU.Controls
 
         protected virtual void InitializeContent()
         {
-            var controls = this.Controls.Cast<Control>().Select(s => s).ToList();
-            var yPos = controls.Max(each => each.Bottom);
             
         }
 
@@ -100,7 +97,6 @@ namespace EyesOnU.Controls
             }
             #endregion
         }
-
 
         public static IEnumerable<Control> GetAllControls(Control control)
         {
