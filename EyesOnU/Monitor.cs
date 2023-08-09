@@ -59,10 +59,8 @@ namespace EyesOnU
 
             this.Shown += (s, e) =>
             {
-                foreach (var each in CounterList)
-                {
-                    Task.Factory.StartNew(() => {  each.StartNext(GetInt("RefreshRate")); });
-                }
+                var refreshRate = GetInt("RefreshRate");
+                CounterList.ForEach(each => { Task.Factory.StartNew(() => { each.StartNext(refreshRate); }); });
             };
         }
 

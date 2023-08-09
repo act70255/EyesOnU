@@ -14,15 +14,32 @@ namespace EyesOnU.Compoment
     public enum CounterType
     {
         [Description("CPU usage")]
+        [CategoryName("Processor")]
+        [CounterName("% Processor Time")]
+        [InstanceName("_Total")]
         [Postfix("%")]
         CPU,
         [Description("RAM usage")]
+        [CategoryName("Process")]
+        [CounterName("Working Set")]
+        [InstanceName("_Total")]
         [Postfix("B")]
         RAMused,
         [Description("RAM useable")]
+        [CategoryName("Memory")]
+        [CounterName("Available Bytes")]
         [Postfix("B")]
         RAMspace,
+        [Description("Disk busy")]
+        [CategoryName("PhysicalDisk")]
+        [CounterName("% Disk Time")]
+        [InstanceName("_Total")]
+        [Postfix("%")]
+        DISK,
         [Description("Network")]
+        [CategoryName("Processor")]
+        [CounterName("% Processor Time")]
+        [InstanceName("_Total")]
         [Postfix("B")]
         NET
     }

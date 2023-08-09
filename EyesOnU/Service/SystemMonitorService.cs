@@ -1,9 +1,11 @@
 ﻿using EyesOnU.Compoment;
+using EyesOnU.Extension;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EyesOnU.Service
@@ -15,9 +17,6 @@ namespace EyesOnU.Service
         public static SystemMonitorService Instance { get { return lazy.Value; } }
 
         List<NetworkCounter> networkCounters = new List<NetworkCounter>();
-        PerformanceCounter performanceCounterCpu;
-        PerformanceCounter performanceCounterRamused;
-        PerformanceCounter performanceCounterRamspace;
 
         private SystemMonitorService()
         {
@@ -27,17 +26,31 @@ namespace EyesOnU.Service
         {
             List<CounterMonitor> monitors = new List<CounterMonitor>();
 
-            performanceCounterCpu = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            monitors.Add(new CounterMonitor(performanceCounterCpu, CounterType.CPU));
-            performanceCounterRamused = new PerformanceCounter("Process", "Working Set", "_Total");
-            monitors.Add(new CounterMonitor(performanceCounterRamused, CounterType.RAMused));
-            performanceCounterRamspace = new PerformanceCounter("Memory", "Available Bytes");
-            monitors.Add(new CounterMonitor(performanceCounterRamspace, CounterType.RAMspace));
+            monitors.AddRange(GetMonitor(CounterType.CPU));
+            monitors.AddRange(GetMonitor(CounterType.RAMused));
+            monitors.AddRange(GetMonitor(CounterType.RAMspace));
+            monitors.AddRange(GetMonitor(CounterType.DISK));
+            monitors.AddRange(GetMonitor(CounterType.NET));
 
-            PerformanceCounterCategory performanceCounterCategory = new PerformanceCounterCategory("Network Interface");
-            networkCounters = performanceCounterCategory.GetInstanceNames().Select(instance => new NetworkCounter(instance)).ToList();
-            monitors.AddRange(networkCounters.Select(counter => new CounterMonitor(counter, CounterType.NET)));
             return monitors;
+        }
+
+        IEnumerable<CounterMonitor> GetMonitor(CounterType counterType)
+        {
+            if (counterType == CounterType.NET)
+            {
+                PerformanceCounterCategory performanceCounterCategory = new PerformanceCounterCategory("Network Interface");
+                networkCounters = performanceCounterCategory.GetInstanceNames().Select(instance => new NetworkCounter(instance)).ToList();
+                return networkCounters.Select(counter => new CounterMonitor(counter, CounterType.NET));
+            }
+            if (string.IsNullOrEmpty(counterType.GetInstanceName()))
+            {
+                return new List<CounterMonitor> { new CounterMonitor(new PerformanceCounter(counterType.GetCategoryName(), counterType.GetCounterName()), counterType) };
+            }
+            else
+            {
+                return new List<CounterMonitor> { new CounterMonitor(new PerformanceCounter(counterType.GetCategoryName(), counterType.GetCounterName(), counterType.GetInstanceName()), counterType) };
+            }
         }
     }
 }
