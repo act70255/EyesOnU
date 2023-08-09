@@ -1,5 +1,5 @@
 ﻿using EyesOnU.Service;
-using EyesOnU.Extension;
+using EyesOnU.Service.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EyesOnU.Compoment
+namespace EyesOnU.Service.Compoment
 {
     public enum CounterType
     {

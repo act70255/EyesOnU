@@ -16,4 +16,8 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EyesOnU.Service\EyesOnU.Service.csproj" />
+  </ItemGroup>
+
 </Project>

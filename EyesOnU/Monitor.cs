@@ -1,6 +1,6 @@
-using EyesOnU.Compoment;
+using EyesOnU.Service.Compoment;
 using EyesOnU.Controls;
-using EyesOnU.Extension;
+using EyesOnU.Service.Extension;
 using EyesOnU.Service;
 using System.Configuration;
 using System.Diagnostics;

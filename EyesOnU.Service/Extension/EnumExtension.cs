@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EyesOnU.Extension
+namespace EyesOnU.Service.Extension
 {
     public class PostfixAttribute : Attribute
     {
@@ -52,7 +52,7 @@ namespace EyesOnU.Extension
             this.InstanceName = value;
         }
     }
-    internal static class EnumExtension
+    public static class EnumExtension
     {
         public static string GetDescription(this Enum value)
         {
