@@ -88,7 +88,7 @@ namespace EyesOnU.Controls
             #region Register dragable
             foreach (var ctrl in GetAllControls(this))
             {
-                if (ctrl is not Button)
+                if (ctrl is not Button && ctrl is not TextBox)
                 {
                     controlsToMove.Add(ctrl);
                 }

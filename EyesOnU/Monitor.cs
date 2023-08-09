@@ -5,6 +5,7 @@ using EyesOnU.Service;
 using System.Configuration;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace EyesOnU
 {
@@ -14,15 +15,27 @@ namespace EyesOnU
 
         SystemMonitorService systemMonitorService = SystemMonitorService.Instance;
         List<CounterMonitor> CounterList = new List<CounterMonitor>();
+        public string RefreshRate
+        {
+            get
+            {
+                return config.AppSettings.Settings["RefreshRate"].Value;
+            }
+            set
+            {
+                config.AppSettings.Settings["RefreshRate"].Value = value;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+                CounterList.ForEach(each => { each.RefreshRate = Convert.ToInt32(value); });
+            }
+        }
         public int GetInt(string key)
         {
-            var value = config.AppSettings.Settings[key]?.Value;
-            return Convert.ToInt32(value);
+            return Convert.ToInt32(RefreshRate);
         }
         public Monitor()
         {
             InitializeComponent();
-            
             this.Shown += (s, e) =>
             {
                 var refreshRate = GetInt("RefreshRate");
@@ -59,27 +72,46 @@ namespace EyesOnU
             }
             #endregion
             #region Operator
+            TextBox txtRefreshRate = new TextBox
+            {
+                BackColor = Color.Black,
+                ForeColor = Color.White,
+                Text = RefreshRate,
+                Location = new Point(0, yPos),
+                TextAlign = HorizontalAlignment.Right,
+            };
+            txtRefreshRate.TextChanged += (s, e) =>
+            {
+                txtRefreshRate.Text = Regex.Replace(txtRefreshRate.Text, @"[^0-9]", "");
+            };
+            txtRefreshRate.KeyPress += (s, e) =>
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                {
+                    e.Handled = true;
+                }
+            };
+            txtRefreshRate.TextChanged += (s, e) =>
+            {
+                RefreshRate = txtRefreshRate.Text;
+            };
+            this.pnlContent.Controls.Add(txtRefreshRate);
+
             Button btnExit = new Button
             {
                 BackColor = Color.Black,
                 ForeColor = Color.White,
                 Text = "Exit",
-                Location = new Point(0, yPos),
+                Location = new Point(txtRefreshRate.Right + 50, yPos),
             };
             btnExit.Click += (s, e) =>
             {
                 this.Close();
             };
             this.pnlContent.Controls.Add(btnExit);
+            
             #endregion
             base.InitializeContent();
-        }
-
-        public static IEnumerable<Control> GetAllControls(Control control)
-        {
-            var controls = control.Controls.Cast<Control>();
-            return controls.SelectMany(ctrl => GetAllControls(ctrl))
-                                          .Concat(controls);
         }
     }
 }

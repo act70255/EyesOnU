@@ -50,6 +50,8 @@ namespace EyesOnU.Service.Compoment
         NetworkCounter _networkCounter;
         public string DisplayValue { get; set; }
         public CounterType CounterType { get; set; }
+        public int RefreshRate { get => _refreshRate; set { _refreshRate = value; Debug.WriteLine($"[{CounterType}]_refreshRate <= {value}"); } }
+        int _refreshRate;
         public CounterMonitor()
         {
         }
@@ -72,11 +74,12 @@ namespace EyesOnU.Service.Compoment
 
         public void StartNext(int refreshRate)
         {
+            RefreshRate = refreshRate;
             while (true)
             {
                 DisplayValue = NextValue();
                 OnValueUpdated(new DataEventArgs(DisplayValue));
-                System.Threading.Thread.Sleep(refreshRate);
+                System.Threading.Thread.Sleep(RefreshRate);
             }
         }
         public string NextValue()
