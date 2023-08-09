@@ -59,7 +59,6 @@ namespace EyesOnU.Controls
             this.TopMost = true;
         }
 
-
         protected virtual void InitializeContent()
         {
             

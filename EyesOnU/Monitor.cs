@@ -22,7 +22,7 @@ namespace EyesOnU
         public Monitor()
         {
             InitializeComponent();
-
+            
             this.Shown += (s, e) =>
             {
                 var refreshRate = GetInt("RefreshRate");
@@ -30,16 +30,6 @@ namespace EyesOnU
             };
         }
 
-        //void InitializeForm()
-        //{
-        //    this.AutoSize = true;
-        //    this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        //    this.pnlContent.AutoSize = true;
-        //    this.pnlContent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        //    this.Location = new Point(0, 0);
-        //    SetAlwaysOnTop();
-        //    SetDragable();
-        //}
         protected override void InitializeContent()
         {
             this.pnlContent.AutoSize = true;
