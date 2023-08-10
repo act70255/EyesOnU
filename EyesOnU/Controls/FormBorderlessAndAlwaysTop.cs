@@ -13,16 +13,8 @@ namespace EyesOnU.Controls
 {
     public partial class FormBorderlessAndAlwaysTop : Form, IMessageFilter
     {
-        #region Always On Top
-        internal static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-        internal const UInt32 SWP_NOSIZE = 0x0001;
-        internal const UInt32 SWP_NOMOVE = 0x0002;
-        internal const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+        public bool IsAlwaysOnTop { get; set; }
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-        #endregion
         #region Dragable
         const int WM_NCLBUTTONDOWN = 0xA1;
         const int HT_CAPTION = 0x2;
@@ -68,19 +60,9 @@ namespace EyesOnU.Controls
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.Location = new Point(0, 0);
-            SetAlwaysOnTop();
             SetDragable();
         }
 
-        protected void SetAlwaysOnTop()
-        {
-            #region AlwaysOnTop
-            this.Load += (s, e) =>
-            {
-                SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
-            };
-            #endregion
-        }
         protected void SetDragable()
         {
             //Dragable
@@ -88,7 +70,7 @@ namespace EyesOnU.Controls
             #region Register dragable
             foreach (var ctrl in GetAllControls(this))
             {
-                if (ctrl is not Button && ctrl is not TextBox)
+                if (ctrl is Label || ctrl is Panel)
                 {
                     controlsToMove.Add(ctrl);
                 }
