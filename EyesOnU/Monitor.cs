@@ -6,6 +6,8 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace EyesOnU
 {
@@ -15,6 +17,7 @@ namespace EyesOnU
 
         SystemMonitorService systemMonitorService = SystemMonitorService.Instance;
         List<CounterMonitor> CounterList = new List<CounterMonitor>();
+        HttpClient httpClient = new HttpClient();
         public string RefreshRate
         {
             get
@@ -23,10 +26,11 @@ namespace EyesOnU
             }
             set
             {
-                config.AppSettings.Settings["RefreshRate"].Value = value;
+                var parsedValue = GetInt(value, 100);
+                config.AppSettings.Settings["RefreshRate"].Value = parsedValue.ToString();
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
-                CounterList.ForEach(each => { each.RefreshRate = Convert.ToInt32(value); });
+                CounterList.ForEach(each => { each.RefreshRate = parsedValue; });
             }
         }
 
@@ -46,9 +50,17 @@ namespace EyesOnU
                 return ColorTranslator.FromHtml(color);
             }
         }
-        public int GetInt(string key)
+        public int GetInt(string key, int defaultValue = 0)
         {
-            return Convert.ToInt32(RefreshRate);
+            if (int.TryParse(key, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                Debug.WriteLine($"[Int Parse failed] {key}");
+                return defaultValue;
+            }
         }
         public Monitor()
         {
@@ -56,7 +68,7 @@ namespace EyesOnU
             BackColor = SettingBackColor;
             this.Shown += (s, e) =>
             {
-                var refreshRate = GetInt("RefreshRate");
+                var refreshRate = GetInt(RefreshRate);
                 CounterList.ForEach(each => { Task.Factory.StartNew(() => { each.StartNext(refreshRate); }); });
                 pnlContent.Controls.OfType<CheckBox>().FirstOrDefault()?.Focus();
             };
@@ -83,7 +95,20 @@ namespace EyesOnU
                 each.ValueUpdated += (s, e) =>
                 {
                     if (s is CounterMonitor data)
+                    {
                         label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t - {e.Data}"; });
+
+                        //try
+                        //{
+                        //    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                        //    var reaponse = httpClient.PostAsync("http://localhost:8888/Index/Data", content).GetAwaiter().GetResult();
+                        //    Debug.WriteLine(reaponse);
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    Debug.WriteLine(ex);
+                        //}
+                    }
                 };
                 this.pnlContent.Controls.Add(label);
                 yPos += label.Height;
