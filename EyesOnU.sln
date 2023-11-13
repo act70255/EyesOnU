@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EyesOnU", "EyesOnU\EyesOnU.csproj", "{F2990BD8-CE14-4930-BFC2-2DEB319A5DAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EyesOnU.Service", "EyesOnU.Service\EyesOnU.Service.csproj", "{003004C5-0DD6-44E1-B384-2D120129A0BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EyesOnU.Service", "EyesOnU.Service\EyesOnU.Service.csproj", "{003004C5-0DD6-44E1-B384-2D120129A0BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

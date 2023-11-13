@@ -45,7 +45,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             FormBorderStyle = FormBorderStyle.None;
             BackColor = Color.Black;
-            TopMost = true;
+            TopMost = false;
             ClientSize = new Size(243, 140);
             Controls.Add(pnlContent);
             Name = "Monitor";

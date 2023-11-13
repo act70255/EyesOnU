@@ -29,6 +29,23 @@ namespace EyesOnU
                 CounterList.ForEach(each => { each.RefreshRate = Convert.ToInt32(value); });
             }
         }
+
+        public Color SettingBackColor
+        {
+            get
+            {
+                var color = config.AppSettings.Settings["BackColor"].Value;
+                return ColorTranslator.FromHtml(color);
+            }
+        }
+        public Color SettingForeColor
+        {
+            get
+            {
+                var color = config.AppSettings.Settings["ForeColor"].Value;
+                return ColorTranslator.FromHtml(color);
+            }
+        }
         public int GetInt(string key)
         {
             return Convert.ToInt32(RefreshRate);
@@ -36,10 +53,12 @@ namespace EyesOnU
         public Monitor()
         {
             InitializeComponent();
+            BackColor = SettingBackColor;
             this.Shown += (s, e) =>
             {
                 var refreshRate = GetInt("RefreshRate");
                 CounterList.ForEach(each => { Task.Factory.StartNew(() => { each.StartNext(refreshRate); }); });
+                pnlContent.Controls.OfType<CheckBox>().FirstOrDefault()?.Focus();
             };
         }
 
@@ -57,8 +76,8 @@ namespace EyesOnU
                     AutoSize = true,
                     Text = "Initializing...",
                     Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))),
-                    BackColor = Color.Black,
-                    ForeColor = Color.White,
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
                     Location = new Point(0, yPos),
                 };
                 each.ValueUpdated += (s, e) =>
@@ -74,8 +93,8 @@ namespace EyesOnU
             #region TextBox RefreshRate
             TextBox txtRefreshRate = new TextBox
             {
-                BackColor = Color.Black,
-                ForeColor = Color.White,
+                BackColor = SettingBackColor,
+                ForeColor = SettingForeColor,
                 Width = 60,
                 Text = RefreshRate,
                 Location = new Point(0, yPos),
@@ -98,11 +117,11 @@ namespace EyesOnU
             };
             this.pnlContent.Controls.Add(txtRefreshRate);
             #endregion
-            #region Button Exit
+            #region CheckBox TopMost
             CheckBox chkLock = new CheckBox
             {
-                BackColor = Color.Black,
-                ForeColor = Color.White,
+                BackColor = SettingBackColor,
+                ForeColor = SettingForeColor,
                 Width = 80,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Text = "TopMost",
@@ -118,8 +137,8 @@ namespace EyesOnU
             #region Button Exit
             Button btnExit = new Button
             {
-                BackColor = Color.Black,
-                ForeColor = Color.White,
+                BackColor = SettingBackColor,
+                ForeColor = SettingForeColor,
                 Text = "Exit",
                 Location = new Point(chkLock.Right + 10, yPos),
             };

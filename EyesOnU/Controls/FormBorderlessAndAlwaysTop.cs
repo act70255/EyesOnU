@@ -41,13 +41,13 @@ namespace EyesOnU.Controls
         public FormBorderlessAndAlwaysTop()
         {
             InitializeComponent();
+            this.TopMost = false;
             this.Load+=(s, e) =>
             {
                 InitializeContent();
                 InitializeForm();
             };
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.TopMost = true;
         }
 
         protected virtual void InitializeContent()
