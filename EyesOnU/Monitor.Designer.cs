@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Monitor));
             pnlContent = new Panel();
             SuspendLayout();
             // 
@@ -36,21 +37,20 @@
             pnlContent.Dock = DockStyle.Fill;
             pnlContent.Location = new Point(0, 0);
             pnlContent.Name = "pnlContent";
-            pnlContent.Size = new Size(100, 100);
+            pnlContent.Size = new Size(0, 0);
             pnlContent.TabIndex = 0;
             // 
             // Monitor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            FormBorderStyle = FormBorderStyle.None;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = Color.Black;
-            TopMost = false;
-            ClientSize = new Size(100, 100);
+            ClientSize = new Size(0, 0);
             Controls.Add(pnlContent);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Monitor";
-            Text = "Form1";
-            
+            Text = "EyesOnU";
             ResumeLayout(false);
         }
 
