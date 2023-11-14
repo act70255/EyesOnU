@@ -36,7 +36,7 @@
             pnlContent.Dock = DockStyle.Fill;
             pnlContent.Location = new Point(0, 0);
             pnlContent.Name = "pnlContent";
-            pnlContent.Size = new Size(243, 140);
+            pnlContent.Size = new Size(100, 100);
             pnlContent.TabIndex = 0;
             // 
             // Monitor
@@ -46,7 +46,7 @@
             FormBorderStyle = FormBorderStyle.None;
             BackColor = Color.Black;
             TopMost = false;
-            ClientSize = new Size(243, 140);
+            ClientSize = new Size(100, 100);
             Controls.Add(pnlContent);
             Name = "Monitor";
             Text = "Form1";

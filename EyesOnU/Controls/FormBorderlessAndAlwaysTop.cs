@@ -70,6 +70,7 @@ namespace EyesOnU.Controls
             #region Register dragable
             foreach (var ctrl in GetAllControls(this))
             {
+                //設定可drag元件類別
                 if (ctrl is Label || ctrl is Panel)
                 {
                     controlsToMove.Add(ctrl);

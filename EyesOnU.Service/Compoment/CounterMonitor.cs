@@ -52,16 +52,22 @@ namespace EyesOnU.Service.Compoment
         public CounterType CounterType { get; set; }
         public int RefreshRate { get => _refreshRate; set { _refreshRate = value; Debug.WriteLine($"[{CounterType}]_refreshRate <= {value}"); } }
         int _refreshRate;
+#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
         public CounterMonitor()
+#pragma warning restore CS8618
         {
         }
+#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
         public CounterMonitor(PerformanceCounter counter, CounterType counterType)
+#pragma warning restore CS8618
         {
             _performanceCounter = counter;
             CounterType = counterType;
         }
 
+#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
         public CounterMonitor(NetworkCounter counter, CounterType counterType)
+#pragma warning restore CS8618
         {
             _networkCounter = counter;
             CounterType = counterType;
