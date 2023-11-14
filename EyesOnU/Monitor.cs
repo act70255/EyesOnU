@@ -8,12 +8,13 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace EyesOnU
 {
     public partial class Monitor : FormBorderlessAndAlwaysTop
     {
-        const float MAXFont = 60;
+        const float MAXFont = 50;
         const float MINFont = 5;
         private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -88,6 +89,32 @@ namespace EyesOnU
                 CounterList.ForEach(each => { Task.Factory.StartNew(() => { each.StartNext(refreshRate); }); });
                 pnlContent.Controls.OfType<CheckBox>().FirstOrDefault()?.Focus();
             };
+        }
+
+        public void ApplyFontSize(float fontSize)
+        {
+            var allElement = GetAllControls(pnlContent);
+            foreach (var each in allElement)
+            {
+                if (each is Label label)
+                    label.Font = new Font(label.Font.FontFamily, fontSize, label.Font.Style, label.Font.Unit, ((byte)(0)));
+                else if (each is TextBox textBox)
+                    textBox.Font = new Font(textBox.Font.FontFamily, fontSize, textBox.Font.Style, textBox.Font.Unit, ((byte)(0)));
+                else if (each is Button button)
+                    button.Font = new Font(button.Font.FontFamily, fontSize, button.Font.Style, button.Font.Unit, ((byte)(0)));
+            }
+
+            var ypos = 0;
+            allElement.Where(f => f is Label).OrderBy(o => o.Top).ToList().ForEach(each =>
+            {
+                each.Location = new Point(each.Location.X, ypos);
+                ypos += each.Height;
+            });
+
+            allElement.Where(f => f is TextBox|| f is CheckBox|| f is Button).ToList().ForEach(each =>
+            {
+                each.Location = new Point(each.Location.X, ypos);
+            });
         }
 
         protected override void InitializeContent()
@@ -193,10 +220,12 @@ namespace EyesOnU
             };
             txtFontSize.KeyPress += (s, e) =>
             {
-                if (e.KeyChar == (char)Keys.Enter && txtFontSize.Text.GetFloat() != FontSize && MessageBox.Show("Restart to Apply?", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                if (e.KeyChar == (char)Keys.Enter && txtFontSize.Text.GetFloat() != FontSize)// && MessageBox.Show("Restart to Apply?", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
                 {
                     FontSize = txtFontSize.Text.GetFloat();
-                    Application.Restart();
+                    //Application.Restart();
+                    ApplyFontSize(FontSize);
+                    txtFontSize.SelectAll();
                 }
                 else if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 {
