@@ -140,7 +140,7 @@ namespace EyesOnU
                 Width = 40,
                 Text = RefreshRate,
                 Location = new Point(0, yPos),
-                TextAlign = HorizontalAlignment.Right,
+                TextAlign = HorizontalAlignment.Center,
             };
             txtRefreshRate.TextChanged += (s, e) =>
             {
@@ -153,6 +153,10 @@ namespace EyesOnU
                 {
                     e.Handled = true;
                 }
+            };
+            txtRefreshRate.GotFocus += (s, e) =>
+            {
+                txtRefreshRate.SelectAll();
             };
             this.pnlContent.Controls.Add(txtRefreshRate);
             #endregion
@@ -180,7 +184,7 @@ namespace EyesOnU
                 ForeColor = SettingForeColor,
                 Width = 30,
                 Text = FontSize.ToString(),
-                TextAlign = HorizontalAlignment.Right,
+                TextAlign = HorizontalAlignment.Center,
                 Location = new Point(chkLock.Right + 10, yPos),
             };
             txtFontSize.TextChanged += (s, e) =>
@@ -198,6 +202,10 @@ namespace EyesOnU
                 {
                     e.Handled = true;
                 }
+            };
+            txtFontSize.GotFocus += (s, e) =>
+            {
+                txtFontSize.SelectAll();
             };
             this.pnlContent.Controls.Add(txtFontSize);
             #endregion
