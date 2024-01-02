@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using EyesOnU.Compoment;
 
 namespace EyesOnU
 {
@@ -18,10 +19,10 @@ namespace EyesOnU
         const float MINFont = 5;
         private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-        SystemMonitorService systemMonitorService = SystemMonitorService.Instance;
+        private readonly SystemMonitorService systemMonitorService = SystemMonitorService.Instance;
         List<CounterMonitor> CounterList = new List<CounterMonitor>();
-        HttpClient httpClient = new HttpClient();
-        public string RefreshRate
+
+        private string RefreshRate
         {
             get
             {
@@ -37,7 +38,7 @@ namespace EyesOnU
             }
         }
 
-        public float FontSize
+        private float FontSize
         {
             get
             {
@@ -62,7 +63,7 @@ namespace EyesOnU
             }
         }
 
-        public Color SettingBackColor
+        private Color SettingBackColor
         {
             get
             {
@@ -70,7 +71,8 @@ namespace EyesOnU
                 return ColorTranslator.FromHtml(color);
             }
         }
-        public Color SettingForeColor
+
+        private Color SettingForeColor
         {
             get
             {
@@ -91,7 +93,7 @@ namespace EyesOnU
             };
         }
 
-        public void ApplyFontSize(float fontSize)
+        private void ApplyFontSize(float fontSize)
         {
             var allElement = GetAllControls(pnlContent);
             foreach (var each in allElement)
@@ -105,15 +107,20 @@ namespace EyesOnU
             }
 
             var ypos = 0;
+            allElement.Where(f => f is Button).ToList().ForEach(each =>
+            {
+                each.Location = new Point(each.Location.X, ypos);
+            });
+            ypos = allElement.Where(f => f is Button).Max(m => m.Bottom);
+            allElement.Where(f => f is TextBox || f is CheckBox).ToList().ForEach(each =>
+            {
+                each.Location = new Point(each.Location.X, ypos);
+            });
+            ypos = allElement.Where(f => f is TextBox || f is CheckBox).Max(m => m.Bottom);
             allElement.Where(f => f is Label).OrderBy(o => o.Top).ToList().ForEach(each =>
             {
                 each.Location = new Point(each.Location.X, ypos);
                 ypos += each.Height;
-            });
-
-            allElement.Where(f => f is TextBox|| f is CheckBox|| f is Button).ToList().ForEach(each =>
-            {
-                each.Location = new Point(each.Location.X, ypos);
             });
         }
 
@@ -122,139 +129,154 @@ namespace EyesOnU
             this.pnlContent.AutoSize = true;
             this.pnlContent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             int yPos = 0;
-            #region Counter
             CounterList = systemMonitorService.GetCounterMonitors();
-            foreach (var each in CounterList)
+
+            AddOperator(this.pnlContent);
+            AddContent(this.pnlContent, CounterList);
+
+            base.InitializeContent();
+            return;
+
+            void AddOperator(Control control)
             {
-                Label label = new Label
+                #region Translate
+                Button btnTranslate = new Button
                 {
-                    AutoSize = true,
-                    Text = "Initializing...",
-                    Font = new Font("Consolas", FontSize, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0))),
                     BackColor = SettingBackColor,
                     ForeColor = SettingForeColor,
+                    Text = "Convert",
                     Location = new Point(0, yPos),
                 };
-                //label.Font = new Font(label.Font.FontFamily, 15, label.Font.Style, label.Font.Unit, ((byte)(0)));
-                each.ValueUpdated += (s, e) =>
+                btnTranslate.Click += (s, e) =>
                 {
-                    if (s is CounterMonitor data)
+                    var translate = new TranslateDialog(SettingBackColor, SettingForeColor);
+                    translate.ShowDialog();
+                };
+                control.Controls.Add(btnTranslate);
+                #endregion
+                #region Button Exit
+                Button btnExit = new Button
+                {
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
+                    Text = "Exit",
+                    Location = new Point(btnTranslate.Right + 150, yPos),
+                };
+                btnExit.Click += (s, e) =>
+                {
+                    this.Close();
+                };
+                control.Controls.Add(btnExit);
+                #endregion
+                yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
+                #region TextBox RefreshRate
+                TextBox txtRefreshRate = new TextBox
+                {
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
+                    Width = 40,
+                    Text = RefreshRate,
+                    Location = new Point(0, yPos),
+                    TextAlign = HorizontalAlignment.Center,
+                };
+                txtRefreshRate.TextChanged += (s, e) =>
+                {
+                    txtRefreshRate.Text = Regex.Replace(txtRefreshRate.Text, @"[^0-9]", "");
+                    RefreshRate = txtRefreshRate.Text;
+                };
+                txtRefreshRate.KeyPress += (s, e) =>
+                {
+                    if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                     {
-                        label.BeginInvoke((MethodInvoker)delegate () { label.Text = $"[{data.CounterType.GetDescription()}]\t - {e.Data}"; });
-
-                        //try
-                        //{
-                        //    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-                        //    var reaponse = httpClient.PostAsync("http://localhost:8888/Index/Data", content).GetAwaiter().GetResult();
-                        //    Debug.WriteLine(reaponse);
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    Debug.WriteLine(ex);
-                        //}
+                        e.Handled = true;
                     }
                 };
-                this.pnlContent.Controls.Add(label);
-                yPos += label.Height;
-            }
-            #endregion
-            #region Operator
-            #region TextBox RefreshRate
-            TextBox txtRefreshRate = new TextBox
-            {
-                BackColor = SettingBackColor,
-                ForeColor = SettingForeColor,
-                Width = 40,
-                Text = RefreshRate,
-                Location = new Point(0, yPos),
-                TextAlign = HorizontalAlignment.Center,
-            };
-            txtRefreshRate.TextChanged += (s, e) =>
-            {
-                txtRefreshRate.Text = Regex.Replace(txtRefreshRate.Text, @"[^0-9]", "");
-                RefreshRate = txtRefreshRate.Text;
-            };
-            txtRefreshRate.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                txtRefreshRate.GotFocus += (s, e) =>
                 {
-                    e.Handled = true;
-                }
-            };
-            txtRefreshRate.GotFocus += (s, e) =>
-            {
-                txtRefreshRate.SelectAll();
-            };
-            this.pnlContent.Controls.Add(txtRefreshRate);
-            #endregion
-            #region CheckBox TopMost
-            CheckBox chkLock = new CheckBox
-            {
-                BackColor = SettingBackColor,
-                ForeColor = SettingForeColor,
-                Width = 60,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Text = "Top",
-                Checked = this.TopMost,
-                Location = new Point(txtRefreshRate.Right + 10, yPos),
-            };
-            chkLock.CheckedChanged += (s, e) =>
-            {
-                this.TopMost = chkLock.Checked;
-            };
-            this.pnlContent.Controls.Add(chkLock);
-            #endregion
-            #region TextBox RefreshRate
-            TextBox txtFontSize = new TextBox
-            {
-                BackColor = SettingBackColor,
-                ForeColor = SettingForeColor,
-                Width = 30,
-                Text = FontSize.ToString(),
-                TextAlign = HorizontalAlignment.Center,
-                Location = new Point(chkLock.Right + 10, yPos),
-            };
-            txtFontSize.TextChanged += (s, e) =>
-            {
-                txtFontSize.Text = txtFontSize.Text.GetFloat(0).ToString();
-            };
-            txtFontSize.KeyPress += (s, e) =>
-            {
-                if (e.KeyChar == (char)Keys.Enter && txtFontSize.Text.GetFloat() != FontSize)// && MessageBox.Show("Restart to Apply?", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    txtRefreshRate.SelectAll();
+                };
+                control.Controls.Add(txtRefreshRate);
+                #endregion
+                #region CheckBox TopMost
+                CheckBox chkLock = new CheckBox
                 {
-                    FontSize = txtFontSize.Text.GetFloat();
-                    //Application.Restart();
-                    ApplyFontSize(FontSize);
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
+                    Width = 60,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Text = "Top",
+                    Checked = this.TopMost,
+                    Location = new Point(txtRefreshRate.Right + 10, yPos),
+                };
+                chkLock.CheckedChanged += (s, e) =>
+                {
+                    this.TopMost = chkLock.Checked;
+                };
+                control.Controls.Add(chkLock);
+                #endregion
+                #region TextBox RefreshRate
+                TextBox txtFontSize = new TextBox
+                {
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
+                    Width = 30,
+                    Text = FontSize.ToString(),
+                    TextAlign = HorizontalAlignment.Center,
+                    Location = new Point(chkLock.Right + 10, yPos),
+                };
+                txtFontSize.TextChanged += (s, e) =>
+                {
+                    txtFontSize.Text = txtFontSize.Text.GetFloat(0).ToString();
+                };
+                txtFontSize.KeyPress += (s, e) =>
+                {
+                    if (e.KeyChar == (char)Keys.Enter && txtFontSize.Text.GetFloat() != FontSize)// && MessageBox.Show("Restart to Apply?", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    {
+                        FontSize = txtFontSize.Text.GetFloat();
+                        //Application.Restart();
+                        ApplyFontSize(FontSize);
+                        txtFontSize.SelectAll();
+                    }
+                    else if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                    {
+                        e.Handled = true;
+                    }
+                };
+                txtFontSize.GotFocus += (s, e) =>
+                {
                     txtFontSize.SelectAll();
-                }
-                else if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                };
+                control.Controls.Add(txtFontSize);
+                #endregion
+                yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
+            }
+            void AddContent(Control control, IEnumerable<CounterMonitor> counterList)
+            {
+                foreach (var each in counterList)
                 {
-                    e.Handled = true;
-                }
-            };
-            txtFontSize.GotFocus += (s, e) =>
-            {
-                txtFontSize.SelectAll();
-            };
-            this.pnlContent.Controls.Add(txtFontSize);
-            #endregion
-            #region Button Exit
-            Button btnExit = new Button
-            {
-                BackColor = SettingBackColor,
-                ForeColor = SettingForeColor,
-                Text = "Exit",
-                Location = new Point(txtFontSize.Right + 10, yPos),
-            };
-            btnExit.Click += (s, e) =>
-            {
-                this.Close();
-            };
-            this.pnlContent.Controls.Add(btnExit);
-            #endregion
+                    Label label = new Label
+                    {
+                        AutoSize = true,
+                        Text = @"Initializing...",
+                        Font = new Font("Consolas", FontSize, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0))),
+                        BackColor = SettingBackColor,
+                        ForeColor = SettingForeColor,
+                        Location = new Point(0, yPos),
+                    };
 
-            #endregion
-            base.InitializeContent();
+                    each.ValueUpdated += (s, e) =>
+                    {
+                        if (s is CounterMonitor data)
+                        {
+                            label.BeginInvoke((MethodInvoker)delegate () { label.Text = $@"[{data.CounterType.GetDescription()}]	 - {e.Data}"; });
+                        }
+                    };
+                    control.Controls.Add(label);
+                    yPos += label.Height;
+                }
+                yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
+            }
+
         }
     }
 }

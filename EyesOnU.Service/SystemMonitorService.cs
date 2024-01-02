@@ -29,6 +29,7 @@ namespace EyesOnU.Service
             monitors.AddRange(GetMonitor(CounterType.CPU));
             monitors.AddRange(GetMonitor(CounterType.RAMused));
             monitors.AddRange(GetMonitor(CounterType.RAMspace));
+            //monitors.AddRange(GetMonitor(CounterType.RAMusage));
             monitors.AddRange(GetMonitor(CounterType.DISK));
             monitors.AddRange(GetMonitor(CounterType.NET));
 

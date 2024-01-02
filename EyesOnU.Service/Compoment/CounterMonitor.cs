@@ -30,6 +30,11 @@ namespace EyesOnU.Service.Compoment
         [CounterName("Available Bytes")]
         [Postfix("B")]
         RAMspace,
+        [Description("RAM usage")]
+        [CategoryName("Memory")]
+        [CounterName("Available Bytes")]
+        [Postfix("%")]
+        RAMusage,
         [Description("Disk busy")]
         [CategoryName("PhysicalDisk")]
         [CounterName("% Disk Time")]
@@ -43,37 +48,32 @@ namespace EyesOnU.Service.Compoment
         [Postfix("B")]
         NET
     }
-    public class CounterMonitor
+    public sealed class CounterMonitor
     {
-        public event EventHandler<DataEventArgs> ValueUpdated;
-        PerformanceCounter _performanceCounter;
-        NetworkCounter _networkCounter;
-        public string DisplayValue { get; set; }
+        public event EventHandler<DataEventArgs>? ValueUpdated;
+        readonly PerformanceCounter? _performanceCounter;
+        readonly NetworkCounter? _networkCounter;
+        private string? DisplayValue { get; set; }
         public CounterType CounterType { get; set; }
         public int RefreshRate { get => _refreshRate; set { _refreshRate = value; Debug.WriteLine($"[{CounterType}]_refreshRate <= {value}"); } }
         int _refreshRate;
-#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
+
         public CounterMonitor()
-#pragma warning restore CS8618
         {
         }
-#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
         public CounterMonitor(PerformanceCounter counter, CounterType counterType)
-#pragma warning restore CS8618
         {
             _performanceCounter = counter;
             CounterType = counterType;
         }
 
-#pragma warning disable CS8618 // 退出建構函式時，不可為 Null 的欄位必須包含非 Null 值。請考慮宣告為可為 Null。
         public CounterMonitor(NetworkCounter counter, CounterType counterType)
-#pragma warning restore CS8618
         {
             _networkCounter = counter;
             CounterType = counterType;
         }
 
-        protected virtual void OnValueUpdated(DataEventArgs e)
+        private void OnValueUpdated(DataEventArgs e)
         {
             ValueUpdated?.Invoke(this, e);
         }
@@ -88,19 +88,26 @@ namespace EyesOnU.Service.Compoment
                 System.Threading.Thread.Sleep(RefreshRate);
             }
         }
-        public string NextValue()
+
+        private string NextValue()
         {
-            if (_performanceCounter != null)
+            switch (CounterType)
             {
-                return $"{ParseValueString(_performanceCounter.NextValue(), CounterType.GetPostfix())}";
+                case CounterType.CPU:
+                case CounterType.RAMused:
+                case CounterType.RAMspace:
+                case CounterType.DISK:
+                case CounterType.RAMusage:
+                    return $"{ParseValueString(_performanceCounter.NextValue(), CounterType.GetPostfix())}";
+
+                case CounterType.NET:
+                    return $"↑{ParseValueString(_networkCounter.GetSent())} ↓{ParseValueString(_networkCounter.GetReceived())}";
+                default:
+                    return "No counter...";
             }
-            else if (_networkCounter != null)
-            {
-                return $"↑{ParseValueString(_networkCounter.GetSent())} ↓{ParseValueString(_networkCounter.GetReceived())}";
-            }
-            return "No counter...";
         }
-        public string ParseValueString(float value, string postfix = "B")
+
+        private string ParseValueString(float value, string postfix = "B")
         {
             string infix = " ";
             var kb = 1024;
@@ -108,37 +115,29 @@ namespace EyesOnU.Service.Compoment
             var gb = Math.Pow(kb, 3);
             if (value > gb)
             {
-                return $"{(value / gb).ToString("0.00")}{infix}{(postfix == "B" ? "GB" : postfix)}";
+                return $"{(value / gb):0.00}{infix}{(postfix == "B" ? "GB" : postfix)}";
             }
             if (value > mb)
             {
-                return $"{(value / mb).ToString("0.00")}{infix}{(postfix == "B" ? "MB" : postfix)}";
+                return $"{(value / mb):0.00}{infix}{(postfix == "B" ? "MB" : postfix)}";
             }
             else if (value > kb)
             {
-                return $"{(value / kb).ToString("0.00")}{infix}{(postfix == "B" ? "KB" : postfix)}";
+                return $"{(value / kb):0.00}{infix}{(postfix == "B" ? "KB" : postfix)}";
             }
             else
             {
-                return $"{value.ToString("0.00")}{infix}{(postfix == "B" ? "B" : postfix)}";
+                return $"{value:0.00}{infix}{(postfix == "B" ? "B" : postfix)}";
             }
         }
     }
 
     public class DataEventArgs : EventArgs
     {
-        public readonly string _data;
+        public string Data { get; }
         public DataEventArgs(string data)
         {
-            _data = data;
-        }
-
-        public string Data
-        {
-            get
-            {
-                return _data;
-            }
+            Data = data;
         }
     }
 }
