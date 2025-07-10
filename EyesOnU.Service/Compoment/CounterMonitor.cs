@@ -46,7 +46,12 @@ namespace EyesOnU.Service.Compoment
         [CounterName("% Processor Time")]
         [InstanceName("_Total")]
         [Postfix("B")]
-        NET
+        NET,
+        /// <summary>
+        /// 純文字
+        /// </summary>
+        [Description("")]
+        Content
     }
     public sealed class CounterMonitor
     {
