@@ -15,6 +15,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace EyesOnU
 {
@@ -66,8 +68,21 @@ namespace EyesOnU
         public DisplayForm(Dictionary<string, string> args)
         {
             InitializeComponent();
+            //this.FormBorderStyle = FormBorderStyle.FixedSingle;
             DisplayDatas = args;
             BackColor = SettingBackColor;
+            this.TopMost = true;
+
+            this.Load += (s, e) =>
+            {
+                // 螢幕尺寸
+                var screenSize = Screen.PrimaryScreen.Bounds;
+                int margin = 10;
+                int x = screenSize.Width - this.Width - margin;
+                // 設定視窗垂直居中
+                int y = (screenSize.Height - this.Height) / 2;
+                this.Location = new Point(x, y);
+            };
         }
 
         private void ApplyFontSize(float fontSize)
@@ -106,52 +121,75 @@ namespace EyesOnU
             this.pnlContent.AutoSize = true;
             this.pnlContent.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             int yPos = 0;
+            Label lblMessage = new Label
+            {
+                Font = new Font("", 12),
+                AutoSize = true,
+                BackColor = SettingBackColor,
+                ForeColor = SettingForeColor,
+            };
 
             AddOperator(this.pnlContent);
             AddContent(this.pnlContent, DisplayDatas);
 
             base.InitializeContent();
             return;
-
             void AddOperator(Control control)
             {
+                Panel pnlOperator = new Panel
+                {
+                    Margin = new Padding(5, 5, 5, 5),
+                    Dock = DockStyle.Top,
+                    BackColor = SettingBackColor,
+                    ForeColor = SettingForeColor,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                };
+                control.Controls.Add(pnlOperator);
                 #region Button Exit
                 Button btnExit = new Button
                 {
                     BackColor = SettingBackColor,
                     ForeColor = SettingForeColor,
-                    AutoSize = true,
+                    Dock = DockStyle.Right,
+                    //AutoSize = true,
                     Text = "Exit",
-                    Location = new Point(0 + 200, yPos),
+                    Height = 15
                 };
                 btnExit.Click += (s, e) =>
                 {
                     this.Close();
                 };
-                control.Controls.Add(btnExit);
+                pnlOperator.Controls.Add(btnExit);
                 #endregion
-                yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
+                //yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
                 #region CheckBox TopMost
                 CheckBox chkLock = new CheckBox
                 {
                     BackColor = SettingBackColor,
                     ForeColor = SettingForeColor,
-                    Width = 260,
                     TextAlign = ContentAlignment.MiddleCenter,
                     Text = "維持在上面",
                     Checked = this.TopMost,
+                    AutoSize = true,
                     Location = new Point(0 + 10, yPos),
                 };
                 chkLock.CheckedChanged += (s, e) =>
                 {
                     this.TopMost = chkLock.Checked;
                 };
-                control.Controls.Add(chkLock);
+                pnlOperator.Controls.Add(chkLock);
+                lblMessage.Top = pnlOperator.Controls.OfType<Control>().Max(m => m.Bottom) + 5;
+                Debug.WriteLine(lblMessage.Top);
+                lblMessage.Left = 5;
+                pnlOperator.Controls.Add(lblMessage);
                 #endregion
                 yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
             }
             void AddContent(Control control, Dictionary<string, string> counterList)
             {
+                pnlContent.BorderStyle = BorderStyle.FixedSingle;
                 foreach (var each in counterList)
                 {
                     Label label = new Label
@@ -163,10 +201,16 @@ namespace EyesOnU
                         ForeColor = SettingForeColor,
                         Location = new Point(0, yPos),
                     };
-                    label.Click += (s, e) =>
+                    label.MouseUp += (s, e) =>
                     {
+                        lblMessage.Text = $"已複製 - {each.Value}";
+                        Debug.WriteLine($"Label Clicked: {each.Key} - {each.Value}");
                         Clipboard.SetText(each.Value);
                     };
+                    //label.Click += (s, e) =>
+                    //{
+                    //    Clipboard.SetText(each.Value);
+                    //};
 
                     control.Controls.Add(label);
                     yPos += label.Height;
