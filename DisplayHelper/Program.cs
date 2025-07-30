@@ -1,13 +1,12 @@
 using System.Configuration;
 using System.Diagnostics;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 
-namespace EyesOnU
+namespace DisplayHelper
 {
     internal static class Program
     {
+        #region Windows API
         // Windows API
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -17,43 +16,6 @@ namespace EyesOnU
         /// 還原視窗
         /// </summary>
         private const int SW_RESTORE = 9;
-
-        private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main(string[] args)
-        {
-            string activeWindow = config.AppSettings.Settings["ActiveWindow"].Value;
-            if (!string.IsNullOrEmpty(activeWindow))
-            {
-                SetProcessToForeground(activeWindow);
-            }
-            
-            SetSingleInstance();
-            ApplicationConfiguration.Initialize();
-            var dict = new Dictionary<string, string>();
-            if (args.Length > 0)
-            {
-                Uri uri = new Uri(args[0]);
-                var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
-                foreach (string key in queryParams)
-                {
-                    dict[key] = queryParams[key];
-                }
-            }
-
-            //var form = new Monitor();
-            if (!dict.Any())
-            {
-                dict["說明"] = "無資料啟動";
-                dict["範例"] = "測試資料0";
-            }
-            var form = new DisplayForm(dict);
-            Application.Run(form);
-        }
 
         /// <summary>
         /// 刪除其他相同進程
@@ -117,6 +79,50 @@ namespace EyesOnU
                 }
             }
             return false; // 未找到其他進程
+        }
+        #endregion
+
+        private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main(string[] args)
+        {
+            string activeWindow = config.AppSettings.Settings["ActiveWindow"].Value;
+            if (!string.IsNullOrEmpty(activeWindow))
+            {
+                SetProcessToForeground(activeWindow);
+            }
+            SetSingleInstance();
+
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            var dict = new Dictionary<string, string>();
+            if (args.Length > 0)
+            {
+                Uri uri = new Uri(args[0]);
+                var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                foreach (string key in queryParams)
+                {
+                    dict[key] = queryParams[key];
+                }
+            }
+
+            //var form = new Monitor();
+            if (!dict.Any())
+            {
+                dict["說明"] = "無資料啟動";
+                dict["範例"] = "測試資料0";
+                dict["範例0"] = "測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0測試資料0";
+                dict["範例1"] = "測試資料0";
+                dict["範例2"] = "測試資料0";
+                dict["範例3"] = "測試資料0";
+                dict["範例4"] = "測試資料0";
+            }
+            Application.Run(new DisplayForm(dict));
         }
     }
 }

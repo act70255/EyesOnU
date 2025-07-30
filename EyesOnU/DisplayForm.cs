@@ -1,22 +1,8 @@
-﻿using EyesOnU.Compoment;
-using EyesOnU.Controls;
-using EyesOnU.Service.Compoment;
+﻿using EyesOnU.Controls;
 using EyesOnU.Service.Extension;
-using EyesOnU.Service;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace EyesOnU
 {
@@ -24,7 +10,7 @@ namespace EyesOnU
     {
         private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         Dictionary<string, string> DisplayDatas = new Dictionary<string, string> { };
-
+        CheckBox chkLock;
         private float FontSize
         {
             get
@@ -71,7 +57,6 @@ namespace EyesOnU
             //this.FormBorderStyle = FormBorderStyle.FixedSingle;
             DisplayDatas = args;
             BackColor = SettingBackColor;
-            this.TopMost = true;
 
             this.Load += (s, e) =>
             {
@@ -82,6 +67,11 @@ namespace EyesOnU
                 // 設定視窗垂直居中
                 int y = (screenSize.Height - this.Height) / 2;
                 this.Location = new Point(x, y);
+            };
+            this.Shown += (s, e) => 
+            {
+                if(chkLock != null)
+                    chkLock.Checked = true;
             };
         }
 
@@ -165,7 +155,7 @@ namespace EyesOnU
                 #endregion
                 //yPos = control.Controls.OfType<Control>().Max(m => m.Bottom);
                 #region CheckBox TopMost
-                CheckBox chkLock = new CheckBox
+                chkLock = new CheckBox
                 {
                     BackColor = SettingBackColor,
                     ForeColor = SettingForeColor,
