@@ -39,8 +39,9 @@ namespace TOPT
             btnImport.Click += (s, e) =>
             {
                 var menu = new ContextMenuStrip();
-                menu.Items.Add("匯入代碼", null, (s, ev) => ShowImportCodeDialog());
                 menu.Items.Add("手動輸入", null, (s, ev) => ShowManualInputDialog());
+                menu.Items.Add("匯入代碼", null, (s, ev) => ShowImportCodeDialog());
+                menu.Items.Add("匯入圖片", null, (s, ev) => ShowImportImageDialog());
                 menu.Show(Cursor.Position);
             };
             pnlOperator.Controls.Add(btnImport);
@@ -64,32 +65,45 @@ namespace TOPT
         }
 
         #region Dialog
+        private void ShowImportImageDialog()
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = "選擇 QR Code 圖片",
+                Filter = "圖片檔 (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp"
+            };
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                try
+                {
+                    var reader = new ZXing.Windows.Compatibility.BarcodeReader();
+                    using var bmp = new Bitmap(ofd.FileName);
+                    var result = reader.Decode(bmp);
+                    if (result != null && result.Text.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 直接複用原有匯入邏輯
+                        ImportOtpAuthUri(result.Text);
+                        InitializeContent();
+                    }
+                    else
+                    {
+                        MessageBox.Show("QRCode錯誤", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"讀取圖片失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        
         private void ShowImportCodeDialog()
         {
             using var dialog = new ImportCodeDialog();
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
                 string importText = dialog.InputText;
-                foreach (var line in importText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (line.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // 解析 otpauth URI
-                        var uri = new Uri(line);
-                        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-                        string secret = query["secret"];
-                        string issuer = query["issuer"] ?? "";
-                        string label = Uri.UnescapeDataString(uri.AbsolutePath.Trim('/'));
-                        // label 格式通常為 issuer:account
-                        if (string.IsNullOrEmpty(issuer) && label.Contains(":"))
-                            issuer = label.Split(':')[0];
-
-                        if (!string.IsNullOrEmpty(secret))
-                        {
-                            RecordProvider.AddRecord(issuer, secret);
-                        }
-                    }
-                }
+                ImportOtpAuthUri(importText);
                 InitializeContent();
             }
         }
@@ -104,7 +118,30 @@ namespace TOPT
                 RecordProvider.AddRecord(description, secret);
                 InitializeContent();
             }
-        } 
+        }
+        private void ImportOtpAuthUri(string uriString)
+        {
+            foreach (var line in uriString.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (line.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 解析 otpauth URI
+                    var uri = new Uri(line);
+                    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                    string secret = query["secret"];
+                    string issuer = query["issuer"] ?? "";
+                    string label = Uri.UnescapeDataString(uri.AbsolutePath.Trim('/'));
+                    // label 格式通常為 issuer:account
+                    if (string.IsNullOrEmpty(issuer) && label.Contains(":"))
+                        issuer = label.Split(':')[0];
+
+                    if (!string.IsNullOrEmpty(secret))
+                    {
+                        RecordProvider.AddRecord(issuer, secret);
+                    }
+                }
+            }
+        }
         #endregion
 
         public override void InitializeContent()
