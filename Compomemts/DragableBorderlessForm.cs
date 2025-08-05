@@ -2,7 +2,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace TOPT
+namespace TOTP
 {
     public partial class DragableBorderlessForm : Form, IMessageFilter
     {
@@ -37,7 +37,7 @@ namespace TOPT
             #region Register dragable
             foreach (var ctrl in GetAllControls(this))
             {
-                //³]©w¥idrag¤¸¥óÃþ§O
+                //è¨­å®šå¯dragå…ƒä»¶é¡žåˆ¥
                 if (ctrl is Label || ctrl is Panel)
                 {
                     controlsToMove.Add(ctrl);
@@ -58,11 +58,11 @@ namespace TOPT
         {
             try
             {
-                // ¿Ã¹õ¤Ø¤o
+                // èž¢å¹•å°ºå¯¸
                 var screenSize = Screen.PrimaryScreen.Bounds;
                 int margin = 10;
                 int x = screenSize.Width - this.Width - margin;
-                // ³]©wµøµ¡««ª½©~¤¤
+                // è¨­å®šè¦–çª—åž‚ç›´å±…ä¸­
                 int y = (screenSize.Height - this.Height) / 2;
                 this.Location = new Point(x, y);
             }
@@ -179,7 +179,7 @@ namespace TOPT
                     };
                     label.MouseUp += (s, e) =>
                     {
-                        lblMessage.Text = $"¤w½Æ»s - {each.Value}";
+                        lblMessage.Text = $"å·²è¤‡è£½ - {each.Value}";
                         Debug.WriteLine($"Label Clicked: {each.Key} - {each.Value}");
                         Clipboard.SetText(each.Value);
                     };
@@ -216,9 +216,9 @@ namespace TOPT
 
         protected virtual void InitializeForm()
         {
-            this.AutoSize = true;
-            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            this.Location = new Point(0, 0);
+            this.AutoScaleMode = AutoScaleMode.Dpi;
+            this.AutoScaleDimensions = new SizeF(96F, 96F);
+            
             SetDragable();
             SetWindowsLocation();
         }

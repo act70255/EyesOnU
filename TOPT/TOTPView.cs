@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TOPT
+namespace TOTP
 {
     public partial class TOTPView : UserControl
     {

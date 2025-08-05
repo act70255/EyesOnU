@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Compomemts\Components.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Controls\FormBorderlessAndAlwaysTop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

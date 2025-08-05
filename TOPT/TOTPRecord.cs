@@ -5,7 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Linq;
 
-namespace TOPT
+namespace TOTP
 {
     public class TOTPRecordModel
     {
@@ -23,7 +23,7 @@ namespace TOPT
             var safeKey = string.Concat(key.Where(char.IsLetterOrDigit)); // Á×§K¯S®í¦r¤¸
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "TOPT", $"{safeKey}.dat");
+                "TOTP", $"{safeKey}.dat");
         }
 
         public static List<TOTPRecordModel> LoadRecords()

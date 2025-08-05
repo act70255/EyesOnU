@@ -1,4 +1,4 @@
-﻿namespace TOPT
+﻿namespace TOTP
 {
     partial class TOTPForm
     {

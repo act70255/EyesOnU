@@ -1,4 +1,4 @@
-﻿namespace TOPT
+﻿namespace TOTP
 {
     partial class DragableBorderlessForm
     {
@@ -48,7 +48,7 @@
             pnlOperator.Location = new Point(0, 0);
             pnlOperator.Margin = new Padding(5);
             pnlOperator.Name = "pnlOperator";
-            pnlOperator.Size = new Size(400, 58);
+            pnlOperator.Size = new Size(240, 58);
             // 
             // chkLock
             // 
@@ -63,9 +63,9 @@
             // btnExit
             // 
             btnExit.Dock = DockStyle.Right;
-            btnExit.Location = new Point(338, 0);
+            btnExit.Location = new Point(180, 0);
             btnExit.Name = "btnExit";
-            btnExit.Size = new Size(60, 56);
+            btnExit.Size = new Size(60, 40);
             btnExit.TabIndex = 1;
             btnExit.Text = "Exit";
             btnExit.FlatStyle = FlatStyle.Flat;
@@ -96,12 +96,15 @@
             // 
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            components = new System.ComponentModel.Container();
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi; // 改為 Dpi 模式
+            AutoScaleDimensions = new SizeF(96F, 96F); // 設定基準 DPI
             //ClientSize = new Size(400, 265);
-            MinimumSize = new Size(300, 58);
+            //MinimumSize = new Size(240, 58);
             Controls.Add(pnlContent);
             Controls.Add(pnlOperator);
             Name = "OPTForm";
-            Text = "TOPT";
+            Text = "Form";
             pnlOperator.ResumeLayout(false);
             pnlOperator.PerformLayout();
             ResumeLayout(false);

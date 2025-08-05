@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayHelper", "DisplayHel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Components", "Compomemts\Components.csproj", "{C25405C6-DF9F-4D63-A811-1262B4119935}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TOPT", "TOPT\TOPT.csproj", "{519AE1CA-7278-4098-B30C-9995B293DC26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TOTP", "TOPT\TOTP.csproj", "{519AE1CA-7278-4098-B30C-9995B293DC26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

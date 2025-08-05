@@ -1,4 +1,4 @@
-﻿namespace TOPT
+﻿namespace TOTP
 {
     partial class TOTPView
     {
@@ -66,32 +66,36 @@
             //
             labelDescription.Dock = DockStyle.Top;
             labelDescription.Font = new Font("Consolas", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            labelDescription.Height = 10;
             labelDescription.TextAlign = ContentAlignment.MiddleLeft;
             labelDescription.Text = "TOTP Code";
             labelDescription.Location = new Point(0, 0);
             labelDescription.Margin = new Padding(0);
-            labelDescription.AutoSize = false;
+            labelDescription.Padding = new Padding(0);
             labelDescription.Height = 25;
             //
             // btnDelete
             //
             btnDelete.Text = "❎";
-            btnDelete.Size = new Size(40, 40);
+            btnDelete.Size = new Size(30, 30);
+            btnDelete.Padding = new Padding(0, 0, 0, 0);
+            btnDelete.Margin = new Padding(0, 0, 0, 0);
             btnDelete.TextAlign = ContentAlignment.MiddleCenter;
             btnDelete.Font = new Font("Consolas", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnDelete.Location = new Point(315, 0);
+            btnDelete.Location = new Point(210, 0);
             btnDelete.FlatStyle = FlatStyle.Flat;
             btnDelete.FlatAppearance.BorderSize = 0;
 
             //this.Controls.Add(labelTime);
             this.Controls.Add(btnDelete);
+            this.Controls.Add(labelTotp);
             this.Controls.Add(labelDescription);
             //this.Controls.Add(progressBar);
-            this.Controls.Add(labelTotp);
             this.Margin = new Padding(0);
             this.Padding = new Padding(0);
-            this.Width = 350;
-            this.Height = 100;
+            this.Width = 240;
+            this.Height = 80;
+            BackColor = Color.FromArgb(30, 30, 30);
             this.MouseUp += TOTPView_MouseUp;
 
             ResumeLayout();

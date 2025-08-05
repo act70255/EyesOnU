@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TOPT
+namespace TOTP
 {
     internal static class Crypto
     {

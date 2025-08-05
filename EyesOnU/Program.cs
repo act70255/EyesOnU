@@ -45,13 +45,13 @@ namespace EyesOnU
                 }
             }
 
-            //var form = new Monitor();
-            if (!dict.Any())
-            {
-                dict["說明"] = "無資料啟動";
-                dict["範例"] = "測試資料0";
-            }
-            var form = new DisplayForm(dict);
+            var form = new Monitor();
+            //if (!dict.Any())
+            //{
+            //    dict["說明"] = "無資料啟動";
+            //    dict["範例"] = "測試資料0";
+            //}
+            //var form = new DisplayForm(dict);
             Application.Run(form);
         }
 

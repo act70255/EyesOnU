@@ -2,9 +2,10 @@ using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using TOTP;
 using Timer = System.Windows.Forms.Timer;
 
-namespace TOPT
+namespace TOTP
 {
     public partial class TOTPForm : DragableBorderlessForm
     {
@@ -39,9 +40,9 @@ namespace TOPT
             btnImport.Click += (s, e) =>
             {
                 var menu = new ContextMenuStrip();
-                menu.Items.Add("¤â°Ê¿é¤J", null, (s, ev) => ShowManualInputDialog());
-                menu.Items.Add("¶×¤J¥N½X", null, (s, ev) => ShowImportCodeDialog());
-                menu.Items.Add("¶×¤J¹Ï¤ù", null, (s, ev) => ShowImportImageDialog());
+                menu.Items.Add("æ‰‹å‹•è¼¸å…¥", null, (s, ev) => ShowManualInputDialog());
+                menu.Items.Add("åŒ¯å…¥ä»£ç¢¼", null, (s, ev) => ShowImportCodeDialog());
+                menu.Items.Add("åŒ¯å…¥åœ–ç‰‡", null, (s, ev) => ShowImportImageDialog());
                 menu.Show(Cursor.Position);
             };
             pnlOperator.Controls.Add(btnImport);
@@ -69,8 +70,8 @@ namespace TOPT
         {
             using var ofd = new OpenFileDialog
             {
-                Title = "¿ï¾Ü QR Code ¹Ï¤ù",
-                Filter = "¹Ï¤ùÀÉ (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp"
+                Title = "é¸æ“‡ QR Code åœ–ç‰‡",
+                Filter = "åœ–ç‰‡æª” (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp"
             };
             if (ofd.ShowDialog(this) == DialogResult.OK)
             {
@@ -81,22 +82,22 @@ namespace TOPT
                     var result = reader.Decode(bmp);
                     if (result != null && result.Text.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase))
                     {
-                        // ª½±µ½Æ¥Î­ì¦³¶×¤JÅŞ¿è
+                        // ç›´æ¥è¤‡ç”¨åŸæœ‰åŒ¯å…¥é‚è¼¯
                         ImportOtpAuthUri(result.Text);
                         InitializeContent();
                     }
                     else
                     {
-                        MessageBox.Show("QRCode¿ù»~", "¿ù»~", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("QRCodeéŒ¯èª¤", "éŒ¯èª¤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Åª¨ú¹Ï¤ù¥¢±Ñ¡G{ex.Message}", "¿ù»~", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"è®€å–åœ–ç‰‡å¤±æ•—ï¼š{ex.Message}", "éŒ¯èª¤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
-        
+
         private void ShowImportCodeDialog()
         {
             using var dialog = new ImportCodeDialog();
@@ -125,13 +126,13 @@ namespace TOPT
             {
                 if (line.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase))
                 {
-                    // ¸ÑªR otpauth URI
+                    // è§£æ otpauth URI
                     var uri = new Uri(line);
                     var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
                     string secret = query["secret"];
                     string issuer = query["issuer"] ?? "";
                     string label = Uri.UnescapeDataString(uri.AbsolutePath.Trim('/'));
-                    // label ®æ¦¡³q±`¬° issuer:account
+                    // label æ ¼å¼é€šå¸¸ç‚º issuer:account
                     if (string.IsNullOrEmpty(issuer) && label.Contains(":"))
                         issuer = label.Split(':')[0];
 
@@ -152,8 +153,9 @@ namespace TOPT
             {
                 try
                 {
-                    TOTPView toptView = new TOTPView(record.Secret, record.Description);
-                    AddContent(toptView);
+                    //Debug.WriteLine($"records: {record.Secret} | {record.Description}");
+                    TOTPView TOTPView = new TOTPView(record.Secret, record.Description);
+                    AddContent(TOTPView);
                 }
                 catch (Exception ex)
                 {
@@ -162,5 +164,10 @@ namespace TOPT
             }
             base.InitializeContent();
         }
+        //protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
+        //{
+        //    // å…è¨±å®Œæ•´çš„ DPI ç¸®æ”¾
+        //    base.ScaleControl(factor, specified);
+        //}
     }
 }
